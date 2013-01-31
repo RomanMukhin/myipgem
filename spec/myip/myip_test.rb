@@ -7,7 +7,7 @@ module Myip
     end
 
     context "#update_ip_database" do
-  	  let(:db_url){"http://software77.net/geo-ip/?DL=1%20-O%20/path/IpToCountry.csv.gz"}
+      let(:db_url){ "http://software77.net/geo-ip/?DL=1%20-O%20/path/IpToCountry.csv.gz" }
       let(:file){ double('file').as_null_object}
 
       before(:all) do
