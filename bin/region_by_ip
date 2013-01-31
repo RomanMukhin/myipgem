@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require 'myip'
+chatter = Myip::Chatter.new
+chatter.region_by_ip
