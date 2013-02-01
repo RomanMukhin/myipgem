@@ -19,6 +19,8 @@ Or install it yourself as:
     $ gem install myip
 
 ## Usage
+  
+  'rspec' command in root file of gem to test gem
 
   Use commands in console after install:
   
