@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
   
-  'rspec' command in root file of gem to test gem
+  Type 'rspec' while in root directory of gem to test gem
 
   Use commands in console after install:
   
