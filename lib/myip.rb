@@ -1,8 +1,8 @@
-require File.dirname(__FILE__)+'/myip/command'
 require 'myip/version'
 require 'net/http' 
 require 'rubygems'
 require 'zlib'
+require File.dirname(__FILE__)+'/myip/command'
 
 
 module Myip
