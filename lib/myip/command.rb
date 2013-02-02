@@ -1,14 +1,15 @@
-require "net/http"
-
 module Myip
   class IPAddr
     def initialize
       begin
+        @@db = []
         spec = Gem::Specification.find_by_name("myip")
         gem_root = spec.gem_dir
         @gem_lib = gem_root + "/lib"
       rescue
         @gem_lib = "./lib"
+      ensure
+        read_the_db if @@db.empty?
       end
     end
     
@@ -17,7 +18,7 @@ module Myip
       define_method "#{name}_by_ip" do |ip|
         begin 
           if (0..2).to_a.include?(index)
-            country_code(make_ip_numeric ip)[2 + index]
+            @@db.find{|l| l[1].to_i >= ip_numeric(ip)}[2 + index]
           else
             find_it = /<#{name}>([^<]*)/
             response = parse_ipgeobase(ip)
@@ -32,10 +33,11 @@ module Myip
     def update_ip_database
       download_db
       unzip_db
+      read_the_db
     end
 
     private
-    def make_ip_numeric(ip)
+    def ip_numeric(ip)
       iterator = -1
       @ip = ip.split('.').reverse.inject(0) do |i, ippart|
         iterator += 1
@@ -66,10 +68,10 @@ module Myip
         puts "Unzipping failed."
       end
     end
-    def country_code numeric_ip
+
+    def read_the_db
       open(@gem_lib+'/IpToCountry.csv') do |file| 
-        ary = file.read.scan(/^"(\d*)","(\d*)","(?:\w*)","(?:\d*)","(\w*)","(\w*)","(\w*)"/)
-        return ary.find{|l| l[1].to_i >= numeric_ip}
+        @@db = file.read.scan(/^"(\d*)","(\d*)","(?:\w*)","(?:\d*)","(\w*)","(\w*)","(\w*)"/) 
       end
     end
 
