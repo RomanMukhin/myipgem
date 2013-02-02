@@ -49,7 +49,7 @@ module Myip
       begin   
         http = Net::HTTP.start("software77.net")
         resp = http.get("/geo-ip/?DL=1 -O /path/IpToCountry.csv.gz")
-        open(@gem_lib+"/IpToCountry.csv.gz", "wb") do |file|
+        open(@gem_lib + "/IpToCountry.csv.gz", "wb") do |file|
           file.write(resp.body)
         end
       rescue
@@ -59,8 +59,8 @@ module Myip
 
     def unzip_db
       begin
-        Zlib::GzipReader.open(@gem_lib+'/IpToCountry.csv.gz') do |gz|
-          g = File.new(@gem_lib+"/IpToCountry.csv", "wb") 
+        Zlib::GzipReader.open(@gem_lib + '/IpToCountry.csv.gz') do |gz|
+          g = File.new(@gem_lib + "/IpToCountry.csv", "wb") 
           g.write gz.read
           g.close
         end
@@ -70,7 +70,7 @@ module Myip
     end
 
     def read_the_db
-      open(@gem_lib+'/IpToCountry.csv') do |file| 
+      open(@gem_lib + '/IpToCountry.csv') do |file| 
         @@db = file.read.scan(/^"(\d*)","(\d*)","(?:\w*)","(?:\d*)","(\w*)","(\w*)","(\w*)"/) 
       end
     end
