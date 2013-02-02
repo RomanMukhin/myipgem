@@ -38,11 +38,11 @@ module Myip
 
     private
     def ip_numeric(ip)
-      iterator = -1
-      @ip = ip.split('.').reverse.inject(0) do |i, ippart|
-        iterator += 1
-        i + ippart.to_i * (256 ** iterator)
+      numeric_ip = 0
+      ip.split('.').each_with_index do |part, i|
+        numeric_ip += part.to_i * (256 ** (3-i))
       end
+      numeric_ip
     end
 
     def download_db
