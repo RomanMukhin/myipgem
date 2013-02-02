@@ -1,5 +1,4 @@
 module Myip
-  require 'webmock/rspec'
   describe IPAddr  do 
     let(:ipaddr){ IPAddr.new }
     before(:each) do
@@ -14,15 +13,16 @@ module Myip
         @dir = ipaddr.instance_variable_get(:@gem_lib)
       end
       before(:each) do
+        ipaddr.stub(:read_the_db)
         file.stub(:write)
-  	  end
+      end
       
       it "should download the database archive and unzip it" do
         ipaddr.stub!(:download_db)
         ipaddr.stub!(:unzip_db)
-
         ipaddr.should_receive(:download_db).ordered
         ipaddr.should_receive(:unzip_db).ordered
+        ipaddr.should_receive(:read_the_db).ordered
         ipaddr.update_ip_database
       end
 
@@ -56,7 +56,6 @@ module Myip
           Zlib::GzipReader.stub(:open).and_yield( archive )
           archive.stub(:read).and_return( "test" )
           File.stub!(:new).and_return( file )
-
           File.should_receive(:new).with( @dir + "/IpToCountry.csv", "wb" )
           file.should_receive(:write).with("test")
           ipaddr.update_ip_database
@@ -72,10 +71,10 @@ module Myip
     end
 
     context "country name by ip from database" do
-      let(:ips){['91.193.232.39', '55.33.22.11', '0.0.0.0']}
-      let(:ctry){['UA', 'FR', 'ZZ']}
-      let(:cntry){['UKR', 'FRA', 'ZZZ']}
-      let(:country){['Ukraine', 'France', 'Reserved']}
+      let(:ips){['91.193.232.39', '175.33.22.11', '0.0.0.1']}
+      let(:ctry){['UA', 'AU', 'ZZ']}
+      let(:cntry){['UKR', 'AUS', 'ZZZ']}
+      let(:country){['Ukraine', 'Australia', 'Reserved']}
       let(:not_valid){ 0101 }
       
       ["ctry","cntry","country"].each_with_index do |name, i|
