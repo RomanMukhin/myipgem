@@ -2,14 +2,11 @@ module Myip
   class IPAddr
     def initialize
       begin
-        @@db = []
         spec = Gem::Specification.find_by_name("myip")
         gem_root = spec.gem_dir
         @gem_lib = gem_root + "/lib"
       rescue
         @gem_lib = "./lib"
-      ensure
-        read_the_db if @@db.empty?
       end
     end
     
@@ -18,7 +15,7 @@ module Myip
       define_method "#{name}_by_ip" do |ip|
         begin 
           if (0..2).to_a.include?(index)
-            @@db.find{|l| l[1].to_i >= ip_numeric(ip)}[2 + index]
+            db_binary_search(ip, index)   
           else
             find_it = /<#{name}>([^<]*)/
             response = parse_ipgeobase(ip)
@@ -33,14 +30,28 @@ module Myip
     def update_ip_database
       download_db
       unzip_db
-      read_the_db
     end
 
     private
+    def db_binary_search ip, index
+      open(@gem_lib + '/IpToCountry.csv') do |file| 
+        proc = Proc.new do |num_ip, min, max|   
+          median = (min + max) / 2
+          file.seek(median - 512)   
+          scan_it = /^"(\d*)","(\d*)","(?:\w*)","(?:\d*)","(\w*)","(\w*)","(\w*)"/
+          ary = file.read(4096).scan(scan_it)
+          proc.call(num_ip, median, max) if ary.empty? || ary.last[1].to_i < num_ip
+          proc.call(num_ip, min, median) if ary.first[0].to_i > num_ip
+          return ary.find{|l| l[1].to_i >= num_ip}[2 + index]
+        end    
+        proc.call(ip_numeric(ip), 0, file.stat.size)
+      end
+    end
+
     def ip_numeric(ip)
       numeric_ip = 0
       ip.split('.').each_with_index do |part, i|
-        numeric_ip += part.to_i * (256 ** (3-i))
+        numeric_ip += part.to_i * (256 ** (3 - i))
       end
       numeric_ip
     end
@@ -66,12 +77,6 @@ module Myip
         end
       rescue
         puts "Unzipping failed."
-      end
-    end
-
-    def read_the_db
-      open(@gem_lib + '/IpToCountry.csv') do |file| 
-        @@db = file.read.scan(/^"(\d*)","(\d*)","(?:\w*)","(?:\d*)","(\w*)","(\w*)","(\w*)"/) 
       end
     end
 
