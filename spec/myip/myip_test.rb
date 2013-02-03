@@ -13,7 +13,6 @@ module Myip
         @dir = ipaddr.instance_variable_get(:@gem_lib)
       end
       before(:each) do
-        ipaddr.stub(:read_the_db)
         file.stub(:write)
       end
       
@@ -22,7 +21,6 @@ module Myip
         ipaddr.stub!(:unzip_db)
         ipaddr.should_receive(:download_db).ordered
         ipaddr.should_receive(:unzip_db).ordered
-        ipaddr.should_receive(:read_the_db).ordered
         ipaddr.update_ip_database
       end
 
