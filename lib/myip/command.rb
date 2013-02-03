@@ -15,7 +15,7 @@ module Myip
       define_method "#{name}_by_ip" do |ip|
         begin 
           if (0..2).to_a.include?(index)
-            db_binary_search(ip, index)   
+            db_binary_search(ip_numeric(ip), index)   
           else
             find_it = /<#{name}>([^<]*)/
             response = parse_ipgeobase(ip)
@@ -35,16 +35,16 @@ module Myip
     private
     def db_binary_search ip, index
       open(@gem_lib + '/IpToCountry.csv') do |file| 
-        proc = Proc.new do |num_ip, min, max|   
+        proc = Proc.new do |min, max|   
           median = (min + max) / 2
           file.seek(median - 512)   
           scan_it = /^"(\d*)","(\d*)","(?:\w*)","(?:\d*)","(\w*)","(\w*)","(\w*)"/
           ary = file.read(4096).scan(scan_it)
-          proc.call(num_ip, median, max) if ary.empty? || ary.last[1].to_i < num_ip
-          proc.call(num_ip, min, median) if ary.first[0].to_i > num_ip
-          return ary.find{|l| l[1].to_i >= num_ip}[2 + index]
+          proc.call(median, max) if ary.empty? || ary.last[1].to_i < ip
+          proc.call(min, median) if ary.first[0].to_i > ip
+          return ary.find{|l| l[1].to_i >= ip}[2 + index]
         end    
-        proc.call(ip_numeric(ip), 0, file.stat.size)
+        proc.call(0, file.stat.size)
       end
     end
 
