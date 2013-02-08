@@ -5,7 +5,6 @@ require 'russian'
 require 'zlib'
 require File.dirname(__FILE__)+'/myip/command'
 
-
 module Myip
   class Chatter
     ["ctry", "cntry", "country", "region", "city"].each_with_index do |name, index|
