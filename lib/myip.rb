@@ -1,6 +1,7 @@
+require 'rubygems'
 require 'myip/version'
 require 'net/http' 
-require 'rubygems'
+require 'russian'
 require 'zlib'
 require File.dirname(__FILE__)+'/myip/command'
 
