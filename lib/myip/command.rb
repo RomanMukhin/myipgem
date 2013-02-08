@@ -82,7 +82,7 @@ module Myip
 
     def parse_ipgeobase ip
       result = Net::HTTP.get(URI.parse("http://ipgeobase.ru:7020/geo?ip=#{ip}"))
-      result.encode('UTF-8', 'WINDOWS-1251')
+      Russian.translit(result.encode('UTF-8', 'WINDOWS-1251')).gsub(' ', '_')
     end
   end
 end
